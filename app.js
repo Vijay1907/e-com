@@ -5,8 +5,10 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
+import cartRoutes from './routes/cartRoute.js';
 
 
+// const backendUrl = "http://localhost:5173"
 const backendUrl = "https://e-com-client-delta.vercel.app"
 const corsOptions = {
     origin: backendUrl,
@@ -29,6 +31,7 @@ app.use(cookieParser());
 // Routes
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/cart', cartRoutes);
 
 
 app.get('/', (req, res) => {
