@@ -7,13 +7,20 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 
 
+const backendUrl = "https://e-com-client-delta.vercel.app"
+const corsOptions = {
+    origin: backendUrl,
+    credentials: true,
+  };
+  
+
 dotenv.config();
 const app = express();
 
 app.use("/uploads", express.static("uploads"));
 
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(cookieParser());

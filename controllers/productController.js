@@ -71,8 +71,59 @@ export const deleteProduct = async (req, res) => {
 export const searchProducts = async (req, res) => {
     try {
         const { name } = req.query;
-        const products = await Product.find({ name: { $regex: name, $options: 'i' } }).populate('category');
-        res.status(200).json({success: true,products});
+
+       
+        const result = await Product.aggregate([
+            { $match: { name: { $regex: name, $options: 'i' } } },
+            {
+                $lookup: {
+                    from: 'e-com_categories',
+                    localField: 'category',
+                    foreignField: '_id',
+                    as: 'categoryInfo'
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    price: 1,
+                    description: 1,
+                    image: 1,
+                    color: 1,
+                    size: 1,
+                    category: { $arrayElemAt: ['$categoryInfo.name', 0] }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    products: { $push: '$$ROOT' },
+                    categories: { $addToSet: '$category' },
+                    colors: { $addToSet: '$color' },
+                    sizes: { $addToSet: '$size' }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    products: 1,
+                    categories: 1,
+                    colors: 1,
+                    sizes: 1
+                }
+            }
+        ]);
+
+        const { products, categories, colors, sizes } = result[0];
+
+        res.status(200).json({
+            success: true,
+            products,
+            categories,
+            colors,
+            sizes
+        });
     } catch (error) {
         res.status(500).json({
             success: false,
